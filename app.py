@@ -2,6 +2,8 @@ import requests
 import os
 from flask import Flask, request, jsonify
 
+app = Flask(__name__)
+
 TRELLO_KEY = os.getenv("TRELLO_KEY")
 TRELLO_TOKEN = os.getenv("TRELLO_TOKEN")
 TRELLO_LIST_ID = os.getenv("TRELLO_LIST_ID")
