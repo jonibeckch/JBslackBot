@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: slack-bot
+    env: python
+    plan: free
+    region: frankfurt
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    autoDeploy: true
+  
