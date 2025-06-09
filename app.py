@@ -1,15 +1,13 @@
 from flask import Flask, request, jsonify
-import os
 
 app = Flask(__name__)
 
-@app.route("/slack/todo", methods=["POST"])
-def todo():
-    user = request.form.get("user_name")
+@app.route("/slash", methods=["POST"])
+def handle_slash():
     text = request.form.get("text")
     return jsonify({
         "response_type": "in_channel",
-        "text": f":white_check_mark: {user} hat ein neues To-Do erstellt: *{text}*"
+        "text": f"Todo empfangen: *{text}*"
     })
 
 if __name__ == "__main__":
