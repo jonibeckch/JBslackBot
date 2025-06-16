@@ -22,32 +22,6 @@ SHEET_ID = os.getenv("SHEET_ID")
 sheet = client.open_by_key(SHEET_ID).sheet1
 
 
-def sort_sheet_by_column(sheet, start_row=3, sort_col=7):
-    data = sheet.get_all_values()
-
-    # Trenne Kopfbereich und Sortierbereich
-    header = data[:start_row - 1]
-    data_to_sort = data[start_row - 1:]
-
-    # Leere Zeilen filtern (optional)
-    data_to_sort = [row for row in data_to_sort if any(cell.strip() for cell in row)]
-
-    # Sortieren nach der gewünschten Spalte
-    data_sorted = sorted(
-        data_to_sort,
-        key=lambda row: row[sort_col - 1] if len(row) >= sort_col and row[sort_col - 1] else '999999'
-    )
-
-    # Neue kombinierte Daten
-    new_data = header + data_sorted
-
-    # Sheet-Zeilen aktualisieren (bestehende Zeilen werden ersetzt)
-    for i, row in enumerate(new_data):
-        sheet.insert_row(row, index=i + 1)
-        sheet.delete_rows(i + 2)
-
-
-
 @app.route("/tobuy", methods=["POST"])
 def handle_tobuy():
     text = request.form.get("text")
@@ -89,8 +63,6 @@ def handle_todo():
     sheet.update_cell(insert_after + 1, 2, "98")          # Spalte B
     sheet.update_cell(insert_after + 1, 4, text)          # Spalte D (Slack-Text)
     sheet.update_cell(insert_after + 1, 7, f'=IF(ISBLANK(F{insert_after + 1});B{insert_after + 1};(-F{insert_after + 1})+46500)')  # Spalte G
-
-    sort_sheet_by_column(sheet, start_row=3)
 
     return jsonify({
         "response_type": "in_channel",
