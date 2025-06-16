@@ -41,7 +41,7 @@ def handle_todo():
     text = request.form.get("text")
 
     # Neuen Eintrag hinzufügen
-    sheet.append_row([datetime.now().isoformat(), text])
+    sheet.append_row("Test2", text])
 
     return jsonify({
         "response_type": "in_channel",
