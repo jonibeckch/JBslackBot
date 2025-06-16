@@ -3,12 +3,25 @@ import os
 from flask import Flask, request, jsonify
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import json
 
 app = Flask(__name__)
 
+#Umgebungsvariablen für Trello Laden
 TRELLO_KEY = os.getenv("TRELLO_KEY")
 TRELLO_TOKEN = os.getenv("TRELLO_TOKEN")
 TRELLO_LIST_ID = os.getenv("TRELLO_LIST_ID")
+
+#Umgebungsvariablen für Google Laden
+creds_json = os.getenv("GOOGLE_CREDS_JSON")
+creds_dict = json.loads(creds_json)
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+client = gspread.authorize(creds)
+SHEET_ID = os.getenv("SHEET_ID")
+sheet = client.open_by_key(SHEET_ID).sheet1
+
+
 
 @app.route("/tobuy", methods=["POST"])
 def handle_tobuy():
@@ -41,6 +54,7 @@ def handle_todo():
     text = request.form.get("text")
 
     # Neuen Eintrag hinzufügen
+
     sheet.append_row(["Test2", text])
 
     return jsonify({
