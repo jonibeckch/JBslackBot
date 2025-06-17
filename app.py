@@ -77,6 +77,7 @@ def handle_tobuy(text):
                 "token": TRELLO_TOKEN,
                 "name": text,
                 "checked": "false"
+                "pos": "top"
             }
         )
 
