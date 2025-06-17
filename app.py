@@ -54,28 +54,34 @@ def slack_events():
 
 # === Handler: /todo ===
 def handle_todo(text):
-    insert_after = 25
-    sheet.insert_row([], index=insert_after + 1)
-    sheet.update_cell(insert_after + 1, 2, "98")  # Spalte B
-    sheet.update_cell(insert_after + 1, 4, text)  # Spalte D
-    sheet.update_cell(insert_after + 1, 7, f'=IF(ISBLANK(F{insert_after + 1});B{insert_after + 1};(-F{insert_after + 1})+46500)')  # Spalte G
+    try:
+        insert_after = 25
+        sheet.insert_row([], index=insert_after + 1)
+        sheet.update_cell(insert_after + 1, 2, "98")
+        sheet.update_cell(insert_after + 1, 4, text)
+        sheet.update_cell(insert_after + 1, 7, f'=IF(ISBLANK(F{insert_after + 1});B{insert_after + 1};(-F{insert_after + 1})+46500)')
+        print(f"Slack-Text eingetragen: {text}")
+    except Exception as e:
+        print(f"Fehler in handle_todo: {e}")
     return "", 200
 
 # === Handler: /tobuy ===
 def handle_tobuy(text):
-    response = requests.post(
-        "https://api.trello.com/1/cards",
-        params={
-            "key": TRELLO_KEY,
-            "token": TRELLO_TOKEN,
-            "idList": TRELLO_LIST_ID,
-            "name": text
-        }
-    )
-
-    if response.status_code == 200:
-        print(f"Trello-Karte erstellt: {text}")
-    else:
-        print(f"Fehler beim Erstellen: {response.text}")
+    try:
+        response = requests.post(
+            "https://api.trello.com/1/cards",
+            params={
+                "key": TRELLO_KEY,
+                "token": TRELLO_TOKEN,
+                "idList": TRELLO_LIST_ID,
+                "name": text
+            }
+        )
+        if response.status_code == 200:
+            print(f"Trello-Karte erstellt: {text}")
+        else:
+            print(f"Fehler beim Erstellen: {response.text}")
+    except Exception as e:
+        print(f"Fehler in handle_tobuy: {e}")
     return "", 200
 
