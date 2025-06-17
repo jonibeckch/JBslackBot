@@ -31,54 +31,6 @@ def handle_wakeup():
             "text": f"Ich bin schon wach!"
         })
 
-@app.route("/tobuy", methods=["POST"])
-def handle_tobuy():
-    text = request.form.get("text")
-
-    # Trello-Karte erstellen
-    response = requests.post(
-        "https://api.trello.com/1/cards",
-        params={
-            "key": TRELLO_KEY,
-            "token": TRELLO_TOKEN,
-            "idList": TRELLO_LIST_ID,
-            "name": text
-        }
-    )
-
-    if response.status_code == 200:
-        return jsonify({
-            "response_type": "in_channel",
-            "text": f"📋 Karte erstellt: *{text}*"
-        })
-    else:
-        return jsonify({
-            "response_type": "ephemeral",
-            "text": f"❌ Fehler beim Erstellen: {response.text}"
-        })
-
-
-@app.route("/todo", methods=["POST"])
-def handle_todo():
-    text = request.form.get("text")
-
-    # Zeile, nach der eingefügt werden soll
-    insert_after = 25
-
-    # Eine neue Zeile nach Zeile 25 einfügen
-    sheet.insert_row([], index=insert_after + 1)
-
-    # Werte setzen
-    sheet.update_cell(insert_after + 1, 2, "98")          # Spalte B
-    sheet.update_cell(insert_after + 1, 4, text)          # Spalte D (Slack-Text)
-    sheet.update_cell(insert_after + 1, 7, f'=IF(ISBLANK(F{insert_after + 1});B{insert_after + 1};(-F{insert_after + 1})+46500)')  # Spalte G
-
-    return jsonify({
-        "response_type": "in_channel",
-        "text": f"📝 Eingetragen: *{text}* in Zeile {insert_after + 1}"
-    })
-
-
 @app.route("/events", methods=["POST"])
 def slack_events():
     data = request.get_json()
