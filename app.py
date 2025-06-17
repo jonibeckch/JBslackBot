@@ -74,3 +74,32 @@ def handle_todo():
         "response_type": "in_channel",
         "text": f"📝 Eingetragen: *{text}* in Zeile {insert_after + 1}"
     })
+
+
+@app.route("/events", methods=["POST"])
+def slack_events():
+    data = request.get_json()
+
+    # Slack URL-Verifizierung beim ersten Setup
+    if data.get("type") == "url_verification":
+        return jsonify({"challenge": data.get("challenge")})
+
+    # Verarbeite Nachrichten
+    if data.get("type") == "event_callback":
+        event = data.get("event", {})
+
+        # Ignoriere Nachrichten vom Bot selbst
+        if event.get("subtype") == "bot_message":
+            return "", 200
+
+        # Prüfe, ob die Nachricht aus dem "todo"-Channel kommt
+        if event.get("channel") == os.getenv("TODO_CHANNEL_ID"):
+            user_text = event.get("text", "")
+
+            # Sende Text intern an deine /todo-Logik
+            requests.post(
+                "https://jbslackbot.onrender.com/todo",
+                data={"text": user_text}
+            )
+
+    return "", 200
