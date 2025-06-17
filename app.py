@@ -21,6 +21,12 @@ client = gspread.authorize(creds)
 SHEET_ID = os.getenv("SHEET_ID")
 sheet = client.open_by_key(SHEET_ID).sheet1
 
+@app.route("/wakeup", methods=["POST"])
+def handle_wakeup():
+        return jsonify({
+            "response_type": "in_channel",
+            "text": f"Ich bin schon wach!"
+        })
 
 @app.route("/tobuy", methods=["POST"])
 def handle_tobuy():
