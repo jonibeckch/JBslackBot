@@ -22,7 +22,7 @@ SHEET_ID = os.getenv("SHEET_ID")
 sheet = client.open_by_key(SHEET_ID).sheet1
 
 TODO_CHANNEL_ID = "C0903PT3SJK"  # Channel-ID von #todo
-TODO_CHANNEL_ID = "C090LFMCE9Y"  # Channel-ID von #tobuy
+TOBUY_CHANNEL_ID = "C090LFMCE9Y"  # Channel-ID von #tobuy
 
 @app.route("/wakeup", methods=["POST"])
 def handle_wakeup():
