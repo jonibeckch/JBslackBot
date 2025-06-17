@@ -21,6 +21,9 @@ client = gspread.authorize(creds)
 SHEET_ID = os.getenv("SHEET_ID")
 sheet = client.open_by_key(SHEET_ID).sheet1
 
+TODO_CHANNEL_ID = "C0903PT3SJK"  # Channel-ID von #todo
+TODO_CHANNEL_ID = "C090LFMCE9Y"  # Channel-ID von #tobuy
+
 @app.route("/wakeup", methods=["POST"])
 def handle_wakeup():
         return jsonify({
@@ -80,26 +83,47 @@ def handle_todo():
 def slack_events():
     data = request.get_json()
 
-    # Slack URL-Verifizierung beim ersten Setup
+    # Verifizierung bei Event-Registrierung
     if data.get("type") == "url_verification":
         return jsonify({"challenge": data.get("challenge")})
 
-    # Verarbeite Nachrichten
     if data.get("type") == "event_callback":
         event = data.get("event", {})
+        channel = event.get("channel")
+        text = event.get("text")
 
-        # Ignoriere Nachrichten vom Bot selbst
-        if event.get("subtype") == "bot_message":
-            return "", 200
-
-        # Prüfe, ob die Nachricht aus dem "todo"-Channel kommt
-        if event.get("channel") == os.getenv("TODO_CHANNEL_ID"):
-            user_text = event.get("text", "")
-
-            # Sende Text intern an deine /todo-Logik
-            requests.post(
-                "https://jbslackbot.onrender.com/todo",
-                data={"text": user_text}
-            )
+        if event.get("type") == "message" and "subtype" not in event:
+            if channel == TODO_CHANNEL_ID:
+                return handle_todo(text)
+            elif channel == TOBUY_CHANNEL_ID:
+                return handle_tobuy(text)
 
     return "", 200
+
+# === Handler: /todo ===
+def handle_todo(text):
+    insert_after = 25
+    sheet.insert_row([], index=insert_after + 1)
+    sheet.update_cell(insert_after + 1, 2, "98")  # Spalte B
+    sheet.update_cell(insert_after + 1, 4, text)  # Spalte D
+    sheet.update_cell(insert_after + 1, 7, f'=IF(ISBLANK(F{insert_after + 1});B{insert_after + 1};(-F{insert_after + 1})+46500)')  # Spalte G
+    return "", 200
+
+# === Handler: /tobuy ===
+def handle_tobuy(text):
+    response = requests.post(
+        "https://api.trello.com/1/cards",
+        params={
+            "key": TRELLO_KEY,
+            "token": TRELLO_TOKEN,
+            "idList": TRELLO_LIST_ID,
+            "name": text
+        }
+    )
+
+    if response.status_code == 200:
+        print(f"Trello-Karte erstellt: {text}")
+    else:
+        print(f"Fehler beim Erstellen: {response.text}")
+    return "", 200
+
