@@ -68,20 +68,24 @@ def handle_todo(text):
 # === Handler: /tobuy ===
 def handle_tobuy(text):
     try:
+        checklist_id = "64d0e16e1649ee4428097fe2"  # feste ID deiner Einkaufsliste
+
         response = requests.post(
-            "https://api.trello.com/1/cards",
+            f"https://api.trello.com/1/checklists/{checklist_id}/checkItems",
             params={
                 "key": TRELLO_KEY,
                 "token": TRELLO_TOKEN,
-                "idList": TRELLO_LIST_ID,
-                "name": text
+                "name": text,
+                "checked": "false"
             }
         )
+
         if response.status_code == 200:
-            print(f"Trello-Karte erstellt: {text}")
+            print(f"✅ '{text}' zur Einkaufsliste hinzugefügt.")
         else:
-            print(f"Fehler beim Erstellen: {response.text}")
+            print(f"❌ Fehler beim Hinzufügen: {response.text}")
+
     except Exception as e:
-        print(f"Fehler in handle_tobuy: {e}")
+        print(f"⚠️ Fehler in handle_tobuy: {e}")
     return "", 200
 
