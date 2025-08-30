@@ -1,5 +1,5 @@
 # JBslackBot
-This is a bot for slack. It reads messages, written in diffeent slack channels and has different functons, depeing on the channel. The service is running on render.com, directly implementing changes from this github repo.
+This is a bot for slack. It reads messages, written in different slack channels and has different functions, depending on the channel. The service is running on render.com, directly implementing changes from this github repo.
 
 Following functions are currently implemented:
 1. Messages written in channel "todos_googlesheet create an entry in a google doc sheet
